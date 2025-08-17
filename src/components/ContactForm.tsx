@@ -1,10 +1,18 @@
 import React, { useState, useEffect } from "react";
 import API from "../api";
+import { Contact } from "../types/contact";
 
 export default function ContactForm({ onAdd, onUpdate, editingContact }) {
   const [formData, setFormData] = useState({ name: "", email: "", phone: "" });
   const [photo, setPhoto] = useState(null);
   const [preview, setPreview] = useState(null);
+  let contact : Contact = {
+    id: "",
+    name: "",
+    email: "",
+    phone: "",
+    createdAt: undefined
+  }
 
   // Prefill form when editing, reset when adding new
   useEffect(() => {
@@ -50,12 +58,16 @@ export default function ContactForm({ onAdd, onUpdate, editingContact }) {
       photoUrl = res.data.path;
     }
 
-    const payload = { ...formData, photoUrl };
+    contact.id = editingContact.id;
+    contact.name = formData.name;
+    contact.email = formData.email;
+    contact.phone = formData.phone;
+    contact.photoUrl = photoUrl;
 
     if (editingContact) {
-      await onUpdate(editingContact.id, payload);
+      await onUpdate(contact);
     } else {
-      await onAdd(payload);
+      await onAdd(contact);
     }
 
     // reset form after submit
@@ -65,40 +77,55 @@ export default function ContactForm({ onAdd, onUpdate, editingContact }) {
   };
 
   return (
-    <form onSubmit={handleSubmit} style={{ marginBottom: "1rem" }}>
-      <input
-        name="name"
-        placeholder="Name"
-        value={formData.name}
-        onChange={handleChange}
-        required
+<form onSubmit={handleSubmit} className="row g-3 mb-4">
+  <div className="col-12">
+    <input
+      name="name"
+      className="form-control"
+      placeholder="Name"
+      value={formData.name}
+      onChange={handleChange}
+      required
+    />
+  </div>
+  <div className="col-12">
+    <input
+      name="email"
+      className="form-control"
+      placeholder="Email"
+      type="email"
+      value={formData.email}
+      onChange={handleChange}
+      required
+    />
+  </div>
+  <div className="col-12">
+    <input
+      name="phone"
+      className="form-control"
+      placeholder="Phone"
+      value={formData.phone}
+      onChange={handleChange}
+    />
+  </div>
+  <div className="col-12">
+    <input type="file" accept="image/*" className="form-control" onChange={handlePhotoChange} />
+  </div>
+  {preview && (
+    <div className="col-12">
+      <img
+        src={preview.startsWith("blob") ? preview : `${API.defaults.baseURL}${preview}`}
+        alt="Preview"
+        width="100"
+        className="mt-2"
       />
-      <input
-        name="email"
-        placeholder="Email"
-        type="email"
-        value={formData.email}
-        onChange={handleChange}
-        required
-      />
-      <input
-        name="phone"
-        placeholder="Phone"
-        value={formData.phone}
-        onChange={handleChange}
-      />
-      <input type="file" accept="image/*" onChange={handlePhotoChange} />
-      {preview && (
-        <img
-          src={preview.startsWith("blob") ? preview : `${API.defaults.baseURL}${preview}`}
-          alt="Preview"
-          width="100"
-          style={{ display: "block", marginTop: "8px" }}
-        />
-      )}
-      <button type="submit">
-        {editingContact ? "Update Contact" : "Add Contact"}
-      </button>
-    </form>
+    </div>
+  )}
+  <div className="col-12">
+    <button type="submit" className="btn btn-primary">
+      {editingContact ? "Update Contact" : "Add Contact"}
+    </button>
+  </div>
+</form>
   );
 }

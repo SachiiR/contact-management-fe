@@ -11,6 +11,7 @@ export default function Contacts() {
   const [total, setTotal] = useState(0);
   const [search, setSearch] = useState("");
   const token = localStorage.getItem("token");
+  const role = localStorage.getItem("role");
 
   // Fetch contacts from API with pagination & search
   const fetchContacts = async () => {
@@ -21,8 +22,8 @@ export default function Contacts() {
       });
 
       // If your backend returns { data, total } for pagination
-      setContacts(res.data); // fallback for simple array
-      setTotal(res.data.length);
+      setContacts(res.data.data); // fallback for simple array
+      setTotal(res.data.total);
     } catch (err) {
       console.error(err);
     }
@@ -39,8 +40,8 @@ export default function Contacts() {
     fetchContacts();
   };
 
-  const updateContact = async (id, updatedData) => {
-    await API.put(`/contacts/${id}`, updatedData, {
+  const updateContact = async (updatedData) => {
+    await API.put(`/contacts/${updatedData.id}`, updatedData, {
       headers: { Authorization: `Bearer ${token}` },
     });
     setEditingContact(null);
@@ -59,43 +60,52 @@ export default function Contacts() {
     setPage(1); // reset to first page on new search
   };
 
+
+
   return (
-    <div>
-      <h2>Contacts</h2>
+<div className="container mt-4">
+  <h2 className="text-center">Contacts</h2>
 
-      <input
-        type="text"
-        placeholder="Search by name or email"
-        value={search}
-        onChange={handleSearchChange}
-        style={{ marginBottom: "10px" }}
-      />
+  <ContactForm
+    onAdd={addContact}
+    onUpdate={updateContact}
+    editingContact={editingContact}
+  />
+  <div className="mb-3">
+    <input
+      type="text"
+      className="form-control"
+      placeholder="Search by name or email"
+      value={search}
+      onChange={handleSearchChange}
+    />
+  </div>
+  <ContactList
+    contacts={contacts || []}
+    onUpdate={(c) => setEditingContact(c)} // edit opens in form
+    onDelete={deleteContact}
+  />
 
-      <ContactForm
-        onAdd={addContact}
-        onUpdate={updateContact}
-        editingContact={editingContact}
-      />
-
-      <ContactList
-        contacts={contacts}
-        onUpdate={(c) => setEditingContact(c)} // edit opens in form
-        onDelete={deleteContact}
-      />
-
-      {/* Pagination Controls */}
-      <div style={{ marginTop: "10px" }}>
-        <button onClick={() => setPage((p) => Math.max(p - 1, 1))} disabled={page === 1}>
-          Prev
-        </button>
-        <span style={{ margin: "0 10px" }}>Page {page} of {Math.ceil(total / limit) || 1}</span>
-        <button
-          onClick={() => setPage((p) => (contacts.length < limit ? p : p + 1))}
-          disabled={contacts.length < limit}
-        >
-          Next
-        </button>
-      </div>
-    </div>
+  {/* Pagination Controls */}
+  <div className="d-flex justify-content-center align-items-center mt-3">
+    <button
+      className="btn btn-primary me-2"
+      onClick={() => setPage((p) => Math.max(p - 1, 1))}
+      disabled={page === 1}
+    >
+      Prev
+    </button>
+    <span className="mx-2">
+      Page {page} of {Math.ceil(total / limit) || 1}
+    </span>
+    <button
+      className="btn btn-primary"
+      onClick={() => setPage((p) => p + 1)}
+      disabled={page >= Math.ceil(total / limit)}
+    >
+      Next
+    </button>
+  </div>
+</div>
   );
 }
