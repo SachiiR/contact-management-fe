@@ -1,20 +1,25 @@
+import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
+import { resetUsers } from "../store/slice/user/user.slice";
+import { RootState } from "../store/store";
 
 export default function Navbar() {
   const navigate = useNavigate();
   const token = localStorage.getItem("token");
+  const user = useSelector((state: RootState) => state.users.currentUser);
+  const dispatch = useDispatch();
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
+    dispatch(resetUsers());
     navigate("/login");
   };
 
   return (
     <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
       <div className="container-fluid">
-        <Link className="navbar-brand" to="/home">
+        <label className="navbar-brand">
           ContactApp
-        </Link>
+        </label>
 
         <button
           className="navbar-toggler"
@@ -33,9 +38,7 @@ export default function Navbar() {
             {token ? (
               <>
                 <li className="nav-item">
-                  <Link className="nav-link" to="/contacts">
-                    Contacts
-                  </Link>
+                 <label className="nav-link"> {user?.name} </label>
                 </li>
                 <li className="nav-item">
                   <button

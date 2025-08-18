@@ -20,12 +20,12 @@ export default function UserList({ users, onUpdate, onViewContacts, onDelete}: U
         </tr>
       </thead>
       <tbody>
-        {users.length > 0 ? (
+        {users?.length > 0 ? (
           users.map((user, index) => (
             <tr key={user.id}>
-              <td>{user.name}</td>
+              <td>{user?.name}</td>
               <td>{user.email}</td>
-              <td>{user.role}</td>
+              <td>{user?.role}</td>
               <td>
               <button
                 className="btn btn-sm btn-warning me-2"
