@@ -2,10 +2,11 @@ import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { resetUsers } from "../store/slice/user/user.slice";
 import { RootState } from "../store/store";
+import { COMMON } from "../utils/constants";
 
 export default function Navbar() {
   const navigate = useNavigate();
-  const token = localStorage.getItem("token");
+  const token = localStorage.getItem(COMMON.TOKEN);
   const user = useSelector((state: RootState) => state.users.currentUser);
   const dispatch = useDispatch();
 

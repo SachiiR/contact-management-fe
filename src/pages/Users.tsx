@@ -7,18 +7,18 @@ import { Contact } from "../types/contact";
 import { setAllUsers, setSelectedUser } from "../store/slice/user/user.slice";
 import { useDispatch } from "react-redux";
 import UserForm from "../components/UserForm";
+import { COMMON } from "../utils/constants";
+import { showError } from "../utils/toasts";
 
 export default function UsersPage() {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [limit] = useState(5);
-  const [total, setTotal] = useState(0);
   const [search, setSearch] = useState("");
-  const token = localStorage.getItem("token");
+  const token = localStorage.getItem(COMMON.TOKEN);
   const navigate = useNavigate();
   const [editingUser, setEditingUser] = useState<User | null>(null);
-  const [userContacts, setUserContacts] = useState<Contact[]>([]);
   const dispatch = useDispatch();
 
   const fetchUsers = async () => {
@@ -32,6 +32,7 @@ export default function UsersPage() {
     } catch (err) {
       console.error(err);
       navigate("/"); // redirect if not admin or unauthorized
+      showError("Failed to fetch users");
     } finally {
       setLoading(false);
     }
@@ -74,7 +75,7 @@ export default function UsersPage() {
 
   return (
     <div className="container mt-4">
-      <h2>All Users (Admin Only)</h2>
+      <h2>All Users</h2>
       <UserList
         users={users}
         onUpdate={(c) => setEditingUser(c)} // edit opens in form

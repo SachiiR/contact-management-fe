@@ -4,11 +4,12 @@ import Register from "./pages/Register";
 import Contacts from "./pages/Contacts";
 import NavigationBar from "./pages/NavigationBar";
 import UsersPage from "./pages/Users";
-import { useEffect, useState } from "react";
+import { COMMON, USER_ROLES } from "./utils/constants";
+import { ToastContainer } from "react-toastify"
 
 function Layout({ children }) {
-  const isAuth = !!localStorage.getItem("token");
-  const role = localStorage.getItem("role");
+  const isAuth = !!localStorage.getItem(COMMON.TOKEN);
+  const role = localStorage.getItem(COMMON.ROLE);
   const location = useLocation();
 
   // Hide navbar on login/register
@@ -22,27 +23,14 @@ function Layout({ children }) {
   );
 }
 export default function App() {
-  // const [isAuth, setIsAuth] = useState(!!localStorage.getItem("token"));
-  // const [role, setRole] = useState(localStorage.getItem("role") || "");
-
-  // Optional: keep state in sync if localStorage changes elsewhere
-  // useEffect(() => {
-  //   const handleStorage = () => {
-  //     setIsAuth(!!localStorage.getItem("token"));
-  //     setRole(localStorage.getItem("role") || "");
-  //   };
-  //   window.addEventListener("storage", handleStorage);
-  //   return () => window.removeEventListener("storage", handleStorage);
-  // }, []);
   
-  const isAuth = !!localStorage.getItem("token");
-  const role = localStorage.getItem("role");
+  const isAuth = !!localStorage.getItem(COMMON.TOKEN);
+  const role = localStorage.getItem(COMMON.ROLE);
 
   return (
     <BrowserRouter>
-      {/* {isAuth ? <NavigationBar setIsAuth={setIsAuth} setRole={setRole} /> : null}
-      <div className="container mt-4"> */}
       <Layout>
+      <ToastContainer />
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
@@ -53,7 +41,7 @@ export default function App() {
           <Route
             path="/users"
             element={
-              isAuth && role === "admin" ? (
+              isAuth && role === USER_ROLES.ADMIN ? (
                 <UsersPage />
               ) : (
                 <Navigate to="/login" />

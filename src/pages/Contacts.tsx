@@ -5,25 +5,31 @@ import ContactList from "../components/ContactList";
 import { useSelector } from "react-redux";
 import { RootState } from "../store/store";
 import { useNavigate } from "react-router-dom";
+import ConfirmDialog from "../components/ConfirmationDialog";
+import { COMMON, PAGINATION, SORT } from "../utils/constants";
 
 export default function Contacts() {
   const [contacts, setContacts] = useState([]);
   const [editingContact, setEditingContact] = useState(null);
-  const [page, setPage] = useState(1);
-  const [limit] = useState(5);
+  const [page, setPage] = useState(PAGINATION.DEFAULT_PAGE);
+  const [limit] = useState(PAGINATION.DEFAULT_LIMIT);
   const [total, setTotal] = useState(0);
   const [search, setSearch] = useState("");
-  const token = localStorage.getItem("token");
+  const token = localStorage.getItem(COMMON.TOKEN);
   const user = useSelector((state: RootState) => state.users);
   const selectedUserId = user.selectedUser?.id;
   const navigate = useNavigate();
+  const [sortBy, setSortBy] = useState(COMMON.NAME); // default sort field
+  const [order, setOrder] = useState(SORT.ASC); 
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [selectedId, setSelectedId] = useState<number | null>(null);
 
   // Fetch contacts from API with pagination & search
   const fetchContacts = async () => {
     try {
       const res = await API.get("/contacts", {
         headers: { Authorization: `Bearer ${token}` },
-        params: { selectedUserId, page, limit, search },
+        params: { selectedUserId, page, limit, search, sortBy, order },
       });
 
       // If your backend returns { data, total } for pagination
@@ -36,7 +42,7 @@ export default function Contacts() {
 
   useEffect(() => {
     fetchContacts();
-  }, [page, search]); // refetch when page or search changes
+  }, [page, search, sortBy, order]); // refetch when page or search changes
 
   const addContact = async (contact) => {
     await API.post("/contacts", contact, {
@@ -59,6 +65,18 @@ export default function Contacts() {
     });
     fetchContacts();
   };
+  const handleDeleteClick = (id: number) => {
+    setSelectedId(id);
+    setShowConfirm(true);
+  };
+
+  const confirmDelete = async () => {
+    if (selectedId !== null) {
+      await deleteContact(selectedId);
+      setShowConfirm(false);
+      setSelectedId(null);
+    }
+  };
 
   const handleSearchChange = (e) => {
     setSearch(e.target.value);
@@ -67,25 +85,25 @@ export default function Contacts() {
 
   return (
     <div className="container mt-4">
-<div className="row align-items-center mb-3">
-  <div className="col">
-    <h2 className="text-start">Contacts</h2>
-  </div>
-  <div className="col text-end">
-    <button
-      className="btn btn-secondary"
-      onClick={() => navigate("/users")}
-    >
-      Back
-    </button>
-  </div>
-</div>
+      <div className="row align-items-center mb-3">
+        <div className="col">
+          <h2 className="text-start">Contacts</h2>
+        </div>
+        <div className="col text-end">
+          <button
+            className="btn btn-secondary"
+            onClick={() => navigate("/users")}
+          >
+            Back
+          </button>
+        </div>
+      </div>
       <ContactForm
         onAdd={addContact}
         onUpdate={updateContact}
         editingContact={editingContact}
       />
-      <div className="mb-3">
+      <div className="row mb-3">
         <input
           type="text"
           className="form-control"
@@ -94,10 +112,21 @@ export default function Contacts() {
           onChange={handleSearchChange}
         />
       </div>
+
       <ContactList
         contacts={contacts || []}
         onUpdate={(c) => setEditingContact(c)} // edit opens in form
-        onDelete={deleteContact}
+        handleDeleteClick={handleDeleteClick}
+        sortBy={sortBy}
+        order={order}
+        onSort={(field) => {
+          if (sortBy === field) {
+            setOrder(order === SORT.ASC ? SORT.DESC : SORT.ASC);
+          } else {
+            setSortBy(field);
+            setOrder(SORT.ASC);
+          }
+        }}
       />
 
       {/* Pagination Controls */}
@@ -120,6 +149,13 @@ export default function Contacts() {
           Next
         </button>
       </div>
+      <ConfirmDialog
+        show={showConfirm}
+        title="Delete Contact"
+        message="Are you sure you want to delete this contact?"
+        onConfirm={confirmDelete}
+        onCancel={() => setShowConfirm(false)}
+      />
     </div>
   );
 }

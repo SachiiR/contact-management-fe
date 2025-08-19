@@ -4,6 +4,8 @@ import { useNavigate } from "react-router-dom";
 import { setCurrentUser } from "../store/slice/user/user.slice";
 import { useDispatch } from "react-redux";
 import AuthImage from "../components/HomePageImage";
+import { COMMON, MESSAGES, USER_ROLES } from "../utils/constants";
+import { showError } from "../utils/toasts";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -15,16 +17,16 @@ export default function Login() {
     e.preventDefault();
     try {
       const res = await API.post("/auth/login", { email, password });
-      localStorage.setItem("token", res.data.access_token);
-      localStorage.setItem("role", res.data.user.role);
+      localStorage.setItem(COMMON.TOKEN, res.data.access_token);
+      localStorage.setItem(COMMON.ROLE, res.data.user.role);
       console.log(res);
       dispatch(setCurrentUser(res.data.user));
 
       // Redirect
-      navigate(res.data.user.role === "admin" ? "/users" : "/contacts");
+      navigate(res.data.user.role === USER_ROLES.ADMIN ? "/users" : "/contacts");
     } catch (err) {
       console.log(err);
-      alert("Invalid credentials");
+      showError(MESSAGES.INVALID_CREDENTIALS);
     }
   };
 
