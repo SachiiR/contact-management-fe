@@ -58,10 +58,10 @@ This is the React frontend for the Contact Management System.
 | `/api/users/:id`	              |`DELETE`	| Deletes a user by ID.|
 
 ### Postman API Example
-src/utils/uploads/AllUsers.png
+- src/utils/uploads/AllUsers.png
 
 ### UI
-src/utils/uploads/Login.png
-src/utils/uploads/Contacts.png
-src/utils/uploads/AllUsers.png
-src/utils/uploads/Register.png
+- src/utils/uploads/Login.png
+- src/utils/uploads/Contacts.png
+- src/utils/uploads/AllUsers.png
+- src/utils/uploads/Register.png
