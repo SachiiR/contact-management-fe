@@ -29,10 +29,43 @@ export default function Contacts() {
 
   /* Fetch contacts from API with pagination & search */
   const fetchContacts = async () => {
+    if (currentUser?.role === USER_ROLES.ADMIN) {
+      // Admin case
+      if (user.selectedUser?.id) {
+        // Admin viewing a specific user's contacts
+        await fetchContactsByUser(); 
+      } else {
+        // Admin viewing all contacts
+        await fetchAllContacts();
+      }
+    } else {
+      // Regular user case
+      await fetchContactsByUser();
+    }
+  };
+
+  /* fetch contacts by user */
+  const fetchContactsByUser = async () => {
     try {
       const res = await API.get("/contacts", {
         headers: { Authorization: `Bearer ${token}` },
         params: { selectedUserId, page, limit, search, sortBy, order },
+      });
+
+      setContacts(res.data.data);
+      setTotal(res.data.total);
+    } catch (err) {
+      console.error(err);
+      showError("Failed to fetch contacts");
+    }
+  };
+
+  /* admin - fetch all contacts */
+  const fetchAllContacts = async () => {
+    try {
+      const res = await API.get("/contacts/all", {
+        headers: { Authorization: `Bearer ${token}` },
+        params: { page, limit, search, sortBy, order },
       });
 
       setContacts(res.data.data);
