@@ -19,7 +19,7 @@ export default function Navbar() {
     <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
       <div className="container-fluid">
         <label className="navbar-brand">
-          ContactApp
+          Contact Management App
         </label>
 
         <button

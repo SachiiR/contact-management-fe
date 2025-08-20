@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import API from "../api";
 import { Contact } from "../types/contact";
 import { COMMON, MESSAGES, REGEX } from "../utils/constants";
-import { validateEmail, validateName } from "../utils/validations";
+import { validateEmail, validateName, validatePhone } from "../utils/validations";
 import { showError } from "../utils/toasts";
 
 export default function ContactForm({ onAdd, onUpdate, editingContact }) {
@@ -47,7 +47,7 @@ export default function ContactForm({ onAdd, onUpdate, editingContact }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    let photoUrl = preview; // keep existing photo for edit
+    let photoUrl = preview; 
     if (photo) {
       const formDataUpload = new FormData();
       formDataUpload.append("photo", photo);
@@ -70,7 +70,7 @@ export default function ContactForm({ onAdd, onUpdate, editingContact }) {
       showError(MESSAGES.INVALID_NAME);
     } else if (!validateEmail(formData.email)) {
       showError(MESSAGES.INVALID_EMAIL);
-    } else if (!validateName(formData.phone)) {
+    } else if (!validatePhone(formData.phone)) {
       showError(MESSAGES.INVALID_PHONE);
     } else {
       if (editingContact) {
@@ -83,6 +83,8 @@ export default function ContactForm({ onAdd, onUpdate, editingContact }) {
       setFormData({ name: "", email: "", phone: "" });
       setPhoto(null);
       setPreview(null);
+      const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+    if (fileInput) fileInput.value = '';
     }
   };
 

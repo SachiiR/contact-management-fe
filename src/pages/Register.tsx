@@ -21,6 +21,7 @@ export default function Register() {
   const handleRegister = async (e) => {
     e.preventDefault();
     try {
+      /*  validate inputs */
       if (!validateEmail(email)) {
         showError(MESSAGES.INVALID_EMAIL);
       } else if (!validateName(name)) {
@@ -28,6 +29,7 @@ export default function Register() {
       } else if (!validatePassword(password)) {
         showError(MESSAGES.PASSWORD_REQUIREMENTS);
       } else {
+        /* register user and navigate to login page */
         await API.post("/auth/register", user);
         navigate("/login");
       }
