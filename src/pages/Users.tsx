@@ -6,7 +6,7 @@ import { User } from "../types/user";
 import { setAllUsers, setSelectedUser } from "../store/slice/user/user.slice";
 import { useDispatch } from "react-redux";
 import UserForm from "../components/UserForm";
-import { COMMON } from "../utils/constants";
+import { COMMON, USER_ROLES } from "../utils/constants";
 import { showError } from "../utils/toasts";
 
 export default function UsersPage() {
@@ -16,6 +16,7 @@ export default function UsersPage() {
   const [limit] = useState(5);
   const [search, setSearch] = useState("");
   const token = localStorage.getItem(COMMON.TOKEN);
+  const role = localStorage.getItem(COMMON.ROLE);
   const navigate = useNavigate();
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const dispatch = useDispatch();
@@ -76,7 +77,21 @@ export default function UsersPage() {
 
   return (
     <div className="container mt-4">
-      <h2>All Users</h2>
+            <div className="row align-items-center mb-3">
+        <div className="col">
+          <h2 className="text-start">All Users</h2>
+        </div>
+        <div className="col text-end">
+        {role === USER_ROLES.ADMIN && (
+          <button
+            className="btn btn-secondary"
+            onClick={() => navigate("/contacts")}
+          >
+            View All Contacts
+          </button>
+        )}
+        </div>
+      </div>
       <UserList
         users={users}
         // edit opens in form
