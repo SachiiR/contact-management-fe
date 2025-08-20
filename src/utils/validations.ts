@@ -16,3 +16,8 @@ export const validateEmail = (email: string): boolean => {
     const regex = REGEX.NAME;
     return regex.test(name);
   };
+
+  export const validatePhone = (phone: string): boolean => {
+    const regex = REGEX.PHONE;
+    return regex.test(phone);
+  };

@@ -1,6 +1,6 @@
 import React, { JSX } from "react";
 import API from "../api";
-import { ChevronUp, ChevronDown } from 'lucide-react';
+import { ChevronUp, ChevronDown } from "lucide-react";
 import { SORT } from "../utils/constants";
 
 export default function ContactList({
@@ -11,7 +11,6 @@ export default function ContactList({
   order,
   onSort,
 }) {
-
   return (
     <div className="table-responsive mt-4">
       <table className="table table-bordered table-hover align-middle">
@@ -25,7 +24,11 @@ export default function ContactList({
               Name
               {sortBy === "name" && (
                 <span style={{ position: "absolute", right: "8px" }}>
-      {order === SORT.ASC ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                  {order === SORT.ASC ? (
+                    <ChevronUp size={16} />
+                  ) : (
+                    <ChevronDown size={16} />
+                  )}
                 </span>
               )}
             </th>
@@ -37,8 +40,11 @@ export default function ContactList({
               Email
               {sortBy === "email" && (
                 <span style={{ position: "absolute", right: "8px" }}>
-{order === SORT.ASC ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-
+                  {order === SORT.ASC ? (
+                    <ChevronUp size={16} />
+                  ) : (
+                    <ChevronDown size={16} />
+                  )}
                 </span>
               )}
             </th>

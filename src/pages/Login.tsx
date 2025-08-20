@@ -13,15 +13,14 @@ export default function Login() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
+  /* initial login, and authorization */
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
       const res = await API.post("/auth/login", { email, password });
       localStorage.setItem(COMMON.TOKEN, res.data.access_token);
       localStorage.setItem(COMMON.ROLE, res.data.user.role);
-      console.log(res);
       dispatch(setCurrentUser(res.data.user));
-
       // Redirect
       navigate(res.data.user.role === USER_ROLES.ADMIN ? "/users" : "/contacts");
     } catch (err) {
@@ -34,8 +33,6 @@ export default function Login() {
     <div className="container mt-5">
       <div className="row align-items-center">
       <AuthImage />
-
-        {/* Right column with login form */}
         <div className="col-md-6">
           <div className="card p-4 shadow">
             <h2 className="mb-4 text-center">Login</h2>
@@ -75,6 +72,6 @@ export default function Login() {
           </div>
         </div>
       </div>
-    </div>
+    </div> 
   );
 }

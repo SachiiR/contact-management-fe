@@ -24,7 +24,7 @@ export const MESSAGES = {
 
 export const PAGINATION = {
   DEFAULT_PAGE: 1,
-  DEFAULT_LIMIT: 5,
+  DEFAULT_LIMIT: 2,
 };
 
 export const SORT = {

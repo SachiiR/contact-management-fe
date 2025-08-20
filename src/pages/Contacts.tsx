@@ -6,7 +6,8 @@ import { useSelector } from "react-redux";
 import { RootState } from "../store/store";
 import { useNavigate } from "react-router-dom";
 import ConfirmDialog from "../components/ConfirmationDialog";
-import { COMMON, PAGINATION, SORT } from "../utils/constants";
+import { COMMON, PAGINATION, SORT, USER_ROLES } from "../utils/constants";
+import { showError } from "../utils/toasts";
 
 export default function Contacts() {
   const [contacts, setContacts] = useState([]);
@@ -18,13 +19,15 @@ export default function Contacts() {
   const token = localStorage.getItem(COMMON.TOKEN);
   const user = useSelector((state: RootState) => state.users);
   const selectedUserId = user.selectedUser?.id;
+  const currentUser = user.currentUser;
   const navigate = useNavigate();
-  const [sortBy, setSortBy] = useState(COMMON.NAME); // default sort field
+  // default sort field
+  const [sortBy, setSortBy] = useState(COMMON.NAME); 
   const [order, setOrder] = useState(SORT.ASC); 
   const [showConfirm, setShowConfirm] = useState(false);
   const [selectedId, setSelectedId] = useState<number | null>(null);
 
-  // Fetch contacts from API with pagination & search
+  /* Fetch contacts from API with pagination & search */
   const fetchContacts = async () => {
     try {
       const res = await API.get("/contacts", {
@@ -32,18 +35,20 @@ export default function Contacts() {
         params: { selectedUserId, page, limit, search, sortBy, order },
       });
 
-      // If your backend returns { data, total } for pagination
-      setContacts(res.data.data); // fallback for simple array
+      setContacts(res.data.data);
       setTotal(res.data.total);
     } catch (err) {
       console.error(err);
+      showError("Failed to fetch contacts");
     }
   };
 
   useEffect(() => {
+    //refetch when page or search changes
     fetchContacts();
-  }, [page, search, sortBy, order]); // refetch when page or search changes
+  }, [page, search, sortBy, order]); 
 
+  /* add contact */
   const addContact = async (contact) => {
     await API.post("/contacts", contact, {
       headers: { Authorization: `Bearer ${token}` },
@@ -51,6 +56,7 @@ export default function Contacts() {
     fetchContacts();
   };
 
+  /* update contact */
   const updateContact = async (updatedData) => {
     await API.put(`/contacts/${updatedData.id}`, updatedData, {
       headers: { Authorization: `Bearer ${token}` },
@@ -59,6 +65,7 @@ export default function Contacts() {
     fetchContacts();
   };
 
+  /* delete contact */
   const deleteContact = async (id) => {
     await API.delete(`/contacts/${id}`, {
       headers: { Authorization: `Bearer ${token}` },
@@ -80,7 +87,8 @@ export default function Contacts() {
 
   const handleSearchChange = (e) => {
     setSearch(e.target.value);
-    setPage(1); // reset to first page on new search
+    //reset to first page on new search
+    setPage(1); 
   };
 
   return (
@@ -90,12 +98,14 @@ export default function Contacts() {
           <h2 className="text-start">Contacts</h2>
         </div>
         <div className="col text-end">
+        {currentUser?.role === USER_ROLES.ADMIN && (
           <button
             className="btn btn-secondary"
             onClick={() => navigate("/users")}
           >
             Back
           </button>
+        )}
         </div>
       </div>
       <ContactForm
@@ -115,7 +125,8 @@ export default function Contacts() {
 
       <ContactList
         contacts={contacts || []}
-        onUpdate={(c) => setEditingContact(c)} // edit opens in form
+        // edit opens in form
+        onUpdate={(c) => setEditingContact(c)} 
         handleDeleteClick={handleDeleteClick}
         sortBy={sortBy}
         order={order}

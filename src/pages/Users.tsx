@@ -3,7 +3,6 @@ import API from "../api";
 import { useNavigate } from "react-router-dom";
 import UserList from "../components/UserList";
 import { User } from "../types/user";
-import { Contact } from "../types/contact";
 import { setAllUsers, setSelectedUser } from "../store/slice/user/user.slice";
 import { useDispatch } from "react-redux";
 import UserForm from "../components/UserForm";
@@ -21,6 +20,7 @@ export default function UsersPage() {
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const dispatch = useDispatch();
 
+  /* fetch all users */
   const fetchUsers = async () => {
     try {
       const res = await API.get("/users", {
@@ -31,7 +31,8 @@ export default function UsersPage() {
       dispatch(setAllUsers(res.data.data));
     } catch (err) {
       console.error(err);
-      navigate("/"); // redirect if not admin or unauthorized
+      //redirect if not admin or unauthorized 
+      navigate("/"); 
       showError("Failed to fetch users");
     } finally {
       setLoading(false);
@@ -41,16 +42,17 @@ export default function UsersPage() {
     fetchUsers();
   }, [token, navigate]);
 
-  // Edit user handler
+  /* Edit user handler*/
   const updateUser = async (updatedData: User) => {
     await API.put(`/users/${updatedData.id}`, updatedData, {
       headers: { Authorization: `Bearer ${token}` },
     });
     setEditingUser(null);
-    fetchUsers(); // refresh users list
+    //refresh users list
+    fetchUsers(); 
   };
 
-  // Delete user handler
+  /* Delete user handler */
   const deleteUser = async (userId: string) => {
     if (
       window.confirm(
@@ -60,14 +62,13 @@ export default function UsersPage() {
       await API.delete(`/users/${userId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      fetchUsers(); // refresh users list
+      fetchUsers(); 
     }
   };
 
   // View user contacts
   const viewUserContacts = async (user: User) => {
     dispatch(setSelectedUser(user));
-
     navigate("/contacts");
   };
 
@@ -78,7 +79,8 @@ export default function UsersPage() {
       <h2>All Users</h2>
       <UserList
         users={users}
-        onUpdate={(c) => setEditingUser(c)} // edit opens in form
+        // edit opens in form
+        onUpdate={(c) => setEditingUser(c)} 
         onDelete={deleteUser}
         onViewContacts={(user: User) => viewUserContacts(user)}
       />
