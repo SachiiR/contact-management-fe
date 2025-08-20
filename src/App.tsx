@@ -10,6 +10,7 @@ import { ToastContainer } from "react-toastify"
 function Layout({ children }) {
   const isAuth = !!localStorage.getItem(COMMON.TOKEN);
   const location = useLocation();
+  const role = localStorage.getItem(COMMON.ROLE);
 
   const hideNavbar = ["/login", "/register"].includes(location.pathname);
 
